@@ -1,4 +1,4 @@
-import Prelude hiding (lookup)
+import Prelude hiding (lookup, LT, GT)
 import qualified Data.Map as M
 
 -- Menge an AST
@@ -12,6 +12,10 @@ data Exp
     | If Exp Exp Exp   -- if not Zero
     | ExpTrue
     | ExpFalse
+    | LT Exp Exp
+    | LE Exp Exp
+    | GT Exp Exp
+    | GE Exp Exp
     deriving Show
 
 type Name = String
@@ -141,3 +145,27 @@ value env x = case x of
 
     ExpTrue -> ValBool True
     ExpFalse -> ValBool False
+
+    LT l r -> case (value env l) of
+        ValInt a -> with_int (value env r) $ \ b ->
+            ValBool $ a < b
+        ValBool a -> with_bool (value env r) $ \ b ->
+            ValBool $ a < b
+
+    LE l r -> case (value env l) of
+        ValInt a -> with_int (value env r) $ \ b ->
+            ValBool $ a <= b
+        ValBool a -> with_bool (value env r) $ \ b ->
+            ValBool $ a <= b
+    
+    GT l r -> case (value env l) of
+        ValInt a -> with_int (value env r) $ \ b ->
+            ValBool $ a > b
+        ValBool a -> with_bool (value env r) $ \ b ->
+            ValBool $ a > b
+
+    GE l r -> case (value env l) of
+        ValInt a -> with_int (value env r) $ \ b ->
+            ValBool $ a >= b
+        ValBool a -> with_bool (value env r) $ \ b ->
+            ValBool $ a >= b
